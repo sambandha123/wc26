@@ -5,7 +5,7 @@ const prisma = require('../prismaClient');
 const { OAuth2Client } = require('google-auth-library');
 const router = express.Router();
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'dummy_id');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || '240057242937-e5plqk1tgkkpeb31mbv328oj4kn2i3j6.apps.googleusercontent.com');
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -64,7 +64,7 @@ router.post('/google', async (req, res) => {
     const { token } = req.body;
     const ticket = await googleClient.verifyIdToken({
       idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID || 'dummy_id',
+      audience: process.env.GOOGLE_CLIENT_ID || '240057242937-e5plqk1tgkkpeb31mbv328oj4kn2i3j6.apps.googleusercontent.com',
     });
     const payload = ticket.getPayload();
     const { sub: google_id, email, name, picture: avatar } = payload;
