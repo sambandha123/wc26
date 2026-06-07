@@ -1,0 +1,121 @@
+import { useState, useContext, useEffect } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import axios from 'axios';
+
+const Admin = () => {
+  const { user } = useContext(AuthContext);
+  const [matchData, setMatchData] = useState({
+    team_a: '', team_b: '', team_a_logo: 'logo_a.png', team_b_logo: 'logo_b.png',
+    match_time: '', stadium: '', group_name: ''
+  });
+  const [message, setMessage] = useState('');
+  const [predictions, setPredictions] = useState([]);
+
+  useEffect(() => {
+    if (user?.role === 'ADMIN') {
+      fetchPredictions();
+    }
+  }, [user]);
+
+  const fetchPredictions = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      const { data } = await axios.get('/api/predictions', config);
+      setPredictions(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleVerify = async (id) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      await axios.put(`/api/predictions/${id}/verify`, {}, config);
+      fetchPredictions();
+    } catch (error) {
+      alert('Error verifying prediction');
+    }
+  };
+
+  if (!user || user.role !== 'ADMIN') {
+    return <div className="text-center mt-20 text-red-500 glass-card p-8 inline-block mx-auto">Access Denied. Admins only.</div>;
+  }
+
+  const handleCreateMatch = async (e) => {
+    e.preventDefault();
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      const payload = { ...matchData, match_time: new Date(matchData.match_time).toISOString() };
+      await axios.post('/api/matches', payload, config);
+      setMessage('Match created successfully');
+      setMatchData({ team_a: '', team_b: '', team_a_logo: 'logo_a.png', team_b_logo: 'logo_b.png', match_time: '', stadium: '', group_name: '' });
+    } catch (error) {
+      setMessage('Error creating match');
+    }
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto py-6 sm:py-8 px-3 sm:px-4 space-y-6 sm:space-y-8">
+      <h2 className="text-2xl sm:text-3xl font-display font-bold text-center text-electric-blue">Admin Dashboard</h2>
+      
+      <div className="glass-card p-4 sm:p-8">
+        <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 border-b border-white/10 pb-2">Create New Match</h3>
+        {message && <div className="mb-6 bg-electric-blue/20 text-electric-blue p-3 rounded-lg border border-electric-blue/50 text-center text-sm sm:text-base">{message}</div>}
+        
+        <form onSubmit={handleCreateMatch} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <input type="text" placeholder="Team A" required value={matchData.team_a} onChange={e => setMatchData({...matchData, team_a: e.target.value})} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base" />
+          <input type="text" placeholder="Team B" required value={matchData.team_b} onChange={e => setMatchData({...matchData, team_b: e.target.value})} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base" />
+          <input type="datetime-local" required value={matchData.match_time} onChange={e => setMatchData({...matchData, match_time: e.target.value})} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base" />
+          <input type="text" placeholder="Stadium" required value={matchData.stadium} onChange={e => setMatchData({...matchData, stadium: e.target.value})} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base" />
+          <input type="text" placeholder="Group Name" required value={matchData.group_name} onChange={e => setMatchData({...matchData, group_name: e.target.value})} className="glass-input md:col-span-2 py-2.5 sm:py-3 text-sm sm:text-base" />
+          <button type="submit" className="btn-primary md:col-span-2 mt-2 sm:mt-4 py-2.5 sm:py-3 text-sm sm:text-base">Create Match</button>
+        </form>
+      </div>
+
+      <div className="glass-card p-4 sm:p-8 overflow-x-auto">
+        <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 border-b border-white/10 pb-2">Recent Predictions & Payments</h3>
+        <table className="w-full text-left border-collapse whitespace-nowrap min-w-[600px]">
+          <thead>
+            <tr className="border-b border-white/20 text-electric-blue">
+              <th className="p-3">User</th>
+              <th className="p-3">Match</th>
+              <th className="p-3">Payment</th>
+              <th className="p-3">Receipt</th>
+              <th className="p-3">Status</th>
+              <th className="p-3">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {predictions.map(pred => (
+              <tr key={pred.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                <td className="p-3">{pred.user?.name}</td>
+                <td className="p-3">{pred.match?.team_a} vs {pred.match?.team_b}</td>
+                <td className="p-3">{pred.payment?.method} ({pred.payment?.transaction_id})</td>
+                <td className="p-3">
+                  {pred.payment?.screenshot_url && (
+                    <a href={`${pred.payment.screenshot_url}`} target="_blank" rel="noreferrer" className="text-electric-blue hover:underline">View</a>
+                  )}
+                </td>
+                <td className="p-3">
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${pred.status === 'VERIFIED' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                    {pred.status}
+                  </span>
+                </td>
+                <td className="p-3">
+                  {pred.status === 'PENDING' && (
+                    <button onClick={() => handleVerify(pred.id)} className="btn-primary py-1 px-3 text-sm">Verify</button>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {predictions.length === 0 && (
+              <tr><td colSpan="6" className="p-6 text-center text-gray-400">No predictions found.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default Admin;

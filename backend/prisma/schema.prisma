@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password_hash String?
+  google_id     String?   @unique
+  role          String    @default("USER")
+  avatar        String?
+  points        Int       @default(0)
+  created_at    DateTime  @default(now())
+
+  predictions   Prediction[]
+  payments      Payment[]
+  notifications Notification[]
+}
+
+model Match {
+  id          String      @id @default(uuid())
+  team_a      String
+  team_b      String
+  team_a_logo String
+  team_b_logo String
+  match_time  DateTime
+  stadium     String
+  group_name  String
+  status      String      @default("UPCOMING")
+  score_a     Int         @default(0)
+  score_b     Int         @default(0)
+  events      String?
+
+  predictions Prediction[]
+}
+
+model Prediction {
+  id            String           @id @default(uuid())
+  user_id       String
+  match_id      String
+  payment_id    String?
+  first_center  String
+  first_corner  String
+  first_scorer  String
+  score_a       Int
+  score_b       Int
+  yellow_cards  Int
+  red_cards     Int
+  winner        String
+  points_earned Int              @default(0)
+  status        String           @default("PENDING")
+
+  user          User    @relation(fields: [user_id], references: [id])
+  match         Match   @relation(fields: [match_id], references: [id])
+  payment       Payment? @relation(fields: [payment_id], references: [id])
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  user_id        String
+  transaction_id String
+  method         String
+  screenshot_url String
+  status         String        @default("PENDING")
+  created_at     DateTime      @default(now())
+
+  user           User          @relation(fields: [user_id], references: [id])
+  predictions    Prediction[]
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  user_id    String
+  title      String
+  message    String
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user       User     @relation(fields: [user_id], references: [id])
+}
+
+model Team {
+  id         String @id @default(uuid())
+  name       String
+  group      String
+  flag       String
+  mp         Int    @default(0)
+  w          Int    @default(0)
+  d          Int    @default(0)
+  l          Int    @default(0)
+  gf         Int    @default(0)
+  ga         Int    @default(0)
+  gd         Int    @default(0)
+  pts        Int    @default(0)
+}
