@@ -10,10 +10,10 @@
     <script>
       window.addEventListener('error', function(e) {
         var stack = e.error && e.error.stack ? e.error.stack.replace(/\\n/g, '<br>') : 'No stack trace';
-        document.body.innerHTML = '<div style="color:red; background:white; position:fixed; z-index:9999; top:0; left:0; width:100%; padding:20px; font-size:16px; word-wrap:break-word;"><b>ERROR:</b> ' + e.message + '<br><br><b>STACK:</b><br>' + stack + '</div>';
+        document.body.innerHTML += '<div style="color:red; background:white; position:relative; z-index:9999; padding:20px; font-size:16px; word-wrap:break-word; border-bottom: 2px solid black;"><b>ERROR:</b> ' + e.message + '<br><br><b>STACK:</b><br>' + stack + '</div>';
       });
       window.addEventListener('unhandledrejection', function(e) {
-        document.body.innerHTML = '<div style="color:red; background:white; position:fixed; z-index:9999; top:0; left:0; width:100%; padding:20px; font-size:16px; word-wrap:break-word;"><b>PROMISE REJECTION:</b> ' + (e.reason && e.reason.stack ? e.reason.stack.replace(/\\n/g, '<br>') : e.reason) + '</div>';
+        document.body.innerHTML += '<div style="color:red; background:white; position:relative; z-index:9999; padding:20px; font-size:16px; word-wrap:break-word; border-bottom: 2px solid black;"><b>PROMISE REJECTION:</b> ' + (e.reason && e.reason.stack ? e.reason.stack.replace(/\\n/g, '<br>') : e.reason) + '</div>';
       });
     </script>
     <div id="root"></div>
