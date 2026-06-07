@@ -69,7 +69,9 @@ const Matches = () => {
           const dateObj = new Date(match.match_time);
           const formattedDate = dateObj.toLocaleDateString('en-US', { timeZone: 'Asia/Kathmandu', weekday: 'short', month: 'short', day: 'numeric' });
           const formattedTime = dateObj.toLocaleTimeString('en-US', { timeZone: 'Asia/Kathmandu', hour: '2-digit', minute: '2-digit', hour12: false });
-          const predictedRecord = myPredictions.find(p => p.match_id === match.id);
+          
+          const predictedRecords = myPredictions.filter(p => p.match_id === match.id);
+          const numPredictions = predictedRecords.length;
           
           const now = new Date();
           const diffInMinutes = (dateObj - now) / (1000 * 60);
@@ -132,14 +134,7 @@ const Matches = () => {
                   <span className="truncate">{match.stadium}</span>
                 </div>
                 
-                {predictedRecord ? (
-                  <button 
-                    disabled
-                    className={`w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base ${predictedRecord.status === 'VERIFIED' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'}`}
-                  >
-                    Predicted ({predictedRecord.status})
-                  </button>
-                ) : match.status === 'FINISHED' ? (
+                {match.status === 'FINISHED' ? (
                   <button 
                     disabled
                     className="w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base bg-white/5 text-gray-500 border-white/10"
@@ -153,12 +148,19 @@ const Matches = () => {
                   >
                     Prediction Closed
                   </button>
+                ) : numPredictions >= 5 ? (
+                  <button 
+                    disabled
+                    className="w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base bg-white/5 text-gray-500 border-white/10"
+                  >
+                    Max Predictions (5/5)
+                  </button>
                 ) : (
                   <button 
                     onClick={() => setSelectedMatch(match)} 
                     className="w-full py-2.5 sm:py-3 rounded-lg bg-transparent hover:bg-electric-blue text-electric-blue hover:text-navy-900 border border-electric-blue/50 hover:border-transparent font-bold tracking-widest uppercase transition-all duration-300 text-sm sm:text-base"
                   >
-                    Predict Match
+                    {numPredictions > 0 ? `Predict Again (${numPredictions}/5)` : 'Predict Match'}
                   </button>
                 )}
               </div>

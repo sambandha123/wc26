@@ -45,6 +45,15 @@ router.post('/', protect, upload.single('screenshot'), async (req, res) => {
       return res.status(400).json({ message: 'Predictions are closed for this match.' });
     }
 
+    // Check prediction limit
+    const existingPredictionsCount = await prisma.prediction.count({
+      where: { user_id: req.user.id, match_id: match_id }
+    });
+    
+    if (existingPredictionsCount >= 5) {
+      return res.status(400).json({ message: 'You have reached the maximum limit of 5 predictions for this match.' });
+    }
+
     // Create payment record
     const payment = await prisma.payment.create({
       data: {
