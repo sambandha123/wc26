@@ -26,7 +26,7 @@ const Navbar = () => {
         <div className="w-full flex justify-between items-center">
           <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3 group">
             <FaFutbol className="text-3xl text-electric-blue group-hover:rotate-180 transition-transform duration-700" />
-            <span className="text-2xl font-display font-bold tracking-wider text-white">WC26 <span className="text-electric-blue">BET</span></span>
+            <span className="text-2xl font-display font-bold tracking-wider text-white">WC26 <span className="text-electric-blue">10 x WIN</span></span>
           </Link>
           
           <button 
