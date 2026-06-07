@@ -2,12 +2,14 @@ import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import MatchResolveModal from '../components/MatchResolveModal';
+import MatchLeaderboardModal from '../components/MatchLeaderboardModal';
 
 const Admin = () => {
   const { user } = useContext(AuthContext);
   const [predictions, setPredictions] = useState([]);
   const [matches, setMatches] = useState([]);
   const [selectedMatchToResolve, setSelectedMatchToResolve] = useState(null);
+  const [selectedMatchForLeaderboard, setSelectedMatchForLeaderboard] = useState(null);
 
   useEffect(() => {
     if (user?.role === 'ADMIN') {
@@ -20,7 +22,7 @@ const Admin = () => {
     try {
       const { data } = await axios.get('/api/matches');
       if (Array.isArray(data)) {
-        setMatches(data.filter(m => m.status !== 'FINISHED'));
+        setMatches(data);
       }
     } catch (error) {
       console.error(error);
@@ -81,7 +83,11 @@ const Admin = () => {
                   </span>
                 </td>
                 <td className="p-3">
-                  <button onClick={() => setSelectedMatchToResolve(match)} className="btn-primary py-1 px-3 text-sm bg-red-600 hover:bg-red-700">Resolve Match</button>
+                  {match.status === 'FINISHED' ? (
+                    <button onClick={() => setSelectedMatchForLeaderboard(match)} className="btn-primary py-1 px-3 text-sm bg-gold text-navy-900 hover:bg-yellow-400">View Leaderboard</button>
+                  ) : (
+                    <button onClick={() => setSelectedMatchToResolve(match)} className="btn-primary py-1 px-3 text-sm bg-red-600 hover:bg-red-700">Resolve Match</button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -138,6 +144,13 @@ const Admin = () => {
           match={selectedMatchToResolve} 
           onClose={() => setSelectedMatchToResolve(null)} 
           onSuccess={() => { setSelectedMatchToResolve(null); fetchMatches(); }} 
+        />
+      )}
+
+      {selectedMatchForLeaderboard && (
+        <MatchLeaderboardModal 
+          match={selectedMatchForLeaderboard} 
+          onClose={() => setSelectedMatchForLeaderboard(null)} 
         />
       )}
     </div>
