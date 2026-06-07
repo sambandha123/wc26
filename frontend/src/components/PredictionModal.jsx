@@ -44,24 +44,25 @@ const PredictionModal = ({ match, onClose }) => {
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex justify-center items-start sm:items-center bg-black/80 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto"
+        className="fixed inset-0 z-[100] flex justify-center items-center bg-black/80 backdrop-blur-sm p-3 sm:p-4"
       >
         <motion.div
           initial={{ scale: 0.9, y: 50 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 50 }}
-          className="bg-navy-900 border border-electric-blue/30 rounded-2xl p-4 sm:p-6 lg:p-8 w-full max-w-4xl my-4 sm:my-8 relative shadow-[0_0_50px_rgba(0,240,255,0.15)]"
+          className="bg-navy-900 border border-electric-blue/30 rounded-2xl p-4 sm:p-6 lg:p-8 w-full max-w-4xl relative shadow-[0_0_50px_rgba(0,240,255,0.15)] flex flex-col max-h-[95vh] md:max-h-[90vh]"
         >
-          <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-light leading-none">&times;</button>
+          <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-light leading-none z-10">&times;</button>
 
-          <h2 className="text-2xl sm:text-3xl font-display font-bold text-center mb-2">Make Prediction</h2>
-          <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-display font-bold text-center mb-2 flex-shrink-0">Make Prediction</h2>
+          <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 flex-shrink-0">
             <img src={match.team_a_logo} alt={match.team_a} className="w-8 h-5 sm:w-10 sm:h-6 object-cover rounded shadow border border-white/10 flex-shrink-0" />
             <p className="text-center text-gold font-semibold text-base sm:text-xl tracking-wide">{match.team_a} vs {match.team_b}</p>
             <img src={match.team_b_logo} alt={match.team_b} className="w-8 h-5 sm:w-10 sm:h-6 object-cover rounded shadow border border-white/10 flex-shrink-0" />
           </div>
 
-          {message && <div className="mb-6 bg-electric-blue/20 text-electric-blue p-3 sm:p-4 rounded-lg border border-electric-blue/50 text-center text-base sm:text-lg">{message}</div>}
+          {message && <div className="mb-4 bg-electric-blue/20 text-electric-blue p-3 sm:p-4 rounded-lg border border-electric-blue/50 text-center text-base sm:text-lg flex-shrink-0">{message}</div>}
 
-          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+          <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 -mr-2 pb-2">
+            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
               {/* Prediction Section */}
               <div className="space-y-4 sm:space-y-5">
@@ -153,6 +154,7 @@ const PredictionModal = ({ match, onClose }) => {
               ) : 'Confirm Prediction'}
             </button>
           </form>
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>
