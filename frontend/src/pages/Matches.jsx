@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import PredictionModal from '../components/PredictionModal';
+import { AuthContext } from '../context/AuthContext';
 
 const Matches = () => {
+  const { user } = useContext(AuthContext);
   const [matches, setMatches] = useState([]);
+  const [myPredictions, setMyPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMatch, setSelectedMatch] = useState(null);
 
@@ -23,8 +26,34 @@ const Matches = () => {
         setLoading(false);
       }
     };
+
+    const fetchMyPredictions = async () => {
+      if (!user) return;
+      try {
+        const config = { headers: { Authorization: `Bearer ${user.token}` } };
+        const { data } = await axios.get('/api/predictions/my', config);
+        if (Array.isArray(data)) {
+          setMyPredictions(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch my predictions", error);
+      }
+    };
+
     fetchMatches();
-  }, []);
+    fetchMyPredictions();
+  }, [user]);
+
+  // Handle when a new prediction is made in the modal
+  const handlePredictionSuccess = () => {
+    setSelectedMatch(null);
+    if (user) {
+      // Re-fetch my predictions to update the UI
+      axios.get('/api/predictions/my', { headers: { Authorization: `Bearer ${user.token}` } })
+        .then(res => setMyPredictions(res.data))
+        .catch(err => console.error(err));
+    }
+  };
 
   if (loading) return <div className="text-center mt-20 text-electric-blue text-xl font-display">Loading matches...</div>;
 
@@ -40,6 +69,7 @@ const Matches = () => {
           const dateObj = new Date(match.match_time);
           const formattedDate = dateObj.toLocaleDateString('en-US', { timeZone: 'Asia/Kathmandu', weekday: 'short', month: 'short', day: 'numeric' });
           const formattedTime = dateObj.toLocaleTimeString('en-US', { timeZone: 'Asia/Kathmandu', hour: '2-digit', minute: '2-digit', hour12: false });
+          const predictedRecord = myPredictions.find(p => p.match_id === match.id);
 
           return (
             <motion.div
@@ -98,12 +128,21 @@ const Matches = () => {
                   <span className="truncate">{match.stadium}</span>
                 </div>
                 
-                <button 
-                  onClick={() => setSelectedMatch(match)} 
-                  className="w-full py-2.5 sm:py-3 rounded-lg bg-transparent hover:bg-electric-blue text-electric-blue hover:text-navy-900 border border-electric-blue/50 hover:border-transparent font-bold tracking-widest uppercase transition-all duration-300 text-sm sm:text-base"
-                >
-                  {match.status === 'FINISHED' ? 'View Details' : 'Predict Match'}
-                </button>
+                {predictedRecord ? (
+                  <button 
+                    disabled
+                    className={`w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base ${predictedRecord.status === 'VERIFIED' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'}`}
+                  >
+                    Predicted ({predictedRecord.status})
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => setSelectedMatch(match)} 
+                    className="w-full py-2.5 sm:py-3 rounded-lg bg-transparent hover:bg-electric-blue text-electric-blue hover:text-navy-900 border border-electric-blue/50 hover:border-transparent font-bold tracking-widest uppercase transition-all duration-300 text-sm sm:text-base"
+                  >
+                    {match.status === 'FINISHED' ? 'View Details' : 'Predict Match'}
+                  </button>
+                )}
               </div>
             </motion.div>
           );
@@ -117,7 +156,7 @@ const Matches = () => {
       )}
 
       {selectedMatch && (
-        <PredictionModal match={selectedMatch} onClose={() => setSelectedMatch(null)} />
+        <PredictionModal match={selectedMatch} onClose={() => setSelectedMatch(null)} onSuccess={handlePredictionSuccess} />
       )}
     </div>
   );

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 
-const PredictionModal = ({ match, onClose }) => {
+const PredictionModal = ({ match, onClose, onSuccess }) => {
   const { user } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     first_center: '', first_corner: '', first_scorer: '',
@@ -35,7 +35,10 @@ const PredictionModal = ({ match, onClose }) => {
       const config = { headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'multipart/form-data' } };
       await axios.post('/api/predictions', data, config);
       setMessage('Prediction submitted successfully! Pending admin approval.');
-      setTimeout(onClose, 2000);
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+        else onClose();
+      }, 2000);
     } catch (error) {
       setMessage('Error submitting prediction.');
     } finally {

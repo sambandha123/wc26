@@ -112,4 +112,18 @@ router.get('/', protect, admin, async (req, res) => {
   }
 });
 
+// Get current user's predictions
+router.get('/my', protect, async (req, res) => {
+  try {
+    const predictions = await prisma.prediction.findMany({
+      where: { user_id: req.user.id },
+      include: { match: true },
+      orderBy: { id: 'desc' }
+    });
+    res.json(predictions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
