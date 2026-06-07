@@ -7,7 +7,10 @@ const PredictionModal = ({ match, onClose }) => {
   const { user } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     first_center: '', first_corner: '', first_scorer: '',
-    score_a: 0, score_b: 0, yellow_cards: 0, red_cards: 0, winner: '',
+    score_a: 0, score_b: 0,
+    yellow_cards_a: 0, yellow_cards_b: 0,
+    red_cards_a: 0, red_cards_b: 0,
+    winner: '',
     transaction_id: '', method: 'ESEWA'
   });
   const [screenshot, setScreenshot] = useState(null);
@@ -100,9 +103,34 @@ const PredictionModal = ({ match, onClose }) => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <input type="number" name="yellow_cards" placeholder="Yellow Cards" required onChange={handleChange} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base w-full" />
-                  <input type="number" name="red_cards" placeholder="Red Cards" required onChange={handleChange} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base w-full" />
+                {/* Yellow Cards per team */}
+                <div>
+                  <label className="text-xs font-semibold text-yellow-400 uppercase tracking-wider mb-2 block">🟨 Yellow Cards</label>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="bg-white/5 p-2 sm:p-3 rounded-lg border border-white/10 flex flex-col items-center">
+                      <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider text-center mb-1 sm:mb-2 line-clamp-2 min-h-[28px] flex items-center">{match.team_a}</label>
+                      <input type="number" name="yellow_cards_a" min="0" required onChange={handleChange} className="w-full bg-transparent text-xl sm:text-2xl font-bold text-center focus:outline-none" defaultValue={0} />
+                    </div>
+                    <div className="bg-white/5 p-2 sm:p-3 rounded-lg border border-white/10 flex flex-col items-center">
+                      <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider text-center mb-1 sm:mb-2 line-clamp-2 min-h-[28px] flex items-center">{match.team_b}</label>
+                      <input type="number" name="yellow_cards_b" min="0" required onChange={handleChange} className="w-full bg-transparent text-xl sm:text-2xl font-bold text-center focus:outline-none" defaultValue={0} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Red Cards per team */}
+                <div>
+                  <label className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-2 block">🟥 Red Cards</label>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="bg-white/5 p-2 sm:p-3 rounded-lg border border-white/10 flex flex-col items-center">
+                      <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider text-center mb-1 sm:mb-2 line-clamp-2 min-h-[28px] flex items-center">{match.team_a}</label>
+                      <input type="number" name="red_cards_a" min="0" required onChange={handleChange} className="w-full bg-transparent text-xl sm:text-2xl font-bold text-center focus:outline-none" defaultValue={0} />
+                    </div>
+                    <div className="bg-white/5 p-2 sm:p-3 rounded-lg border border-white/10 flex flex-col items-center">
+                      <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider text-center mb-1 sm:mb-2 line-clamp-2 min-h-[28px] flex items-center">{match.team_b}</label>
+                      <input type="number" name="red_cards_b" min="0" required onChange={handleChange} className="w-full bg-transparent text-xl sm:text-2xl font-bold text-center focus:outline-none" defaultValue={0} />
+                    </div>
+                  </div>
                 </div>
 
                 <select name="winner" required onChange={handleChange} className="glass-input text-white bg-navy-900 border-electric-blue/50 focus:border-electric-blue py-2.5 sm:py-3 text-sm sm:text-base">

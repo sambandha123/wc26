@@ -30,7 +30,7 @@ router.post('/', protect, upload.single('screenshot'), async (req, res) => {
     const { 
       match_id, transaction_id, method, 
       first_center, first_corner, first_scorer, 
-      score_a, score_b, yellow_cards, red_cards, winner 
+      score_a, score_b, yellow_cards_a, yellow_cards_b, red_cards_a, red_cards_b, winner 
     } = req.body;
 
     // Create payment record
@@ -54,8 +54,10 @@ router.post('/', protect, upload.single('screenshot'), async (req, res) => {
         first_scorer,
         score_a: parseInt(score_a),
         score_b: parseInt(score_b),
-        yellow_cards: parseInt(yellow_cards),
-        red_cards: parseInt(red_cards),
+        yellow_cards_a: parseInt(yellow_cards_a),
+        yellow_cards_b: parseInt(yellow_cards_b),
+        red_cards_a: parseInt(red_cards_a),
+        red_cards_b: parseInt(red_cards_b),
         winner
       }
     });

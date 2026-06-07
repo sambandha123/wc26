@@ -51,8 +51,10 @@ model Prediction {
   first_scorer  String
   score_a       Int
   score_b       Int
-  yellow_cards  Int
-  red_cards     Int
+  yellow_cards_a Int
+  yellow_cards_b Int
+  red_cards_a    Int
+  red_cards_b    Int
   winner        String
   points_earned Int              @default(0)
   status        String           @default("PENDING")
