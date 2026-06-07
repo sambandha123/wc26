@@ -48,40 +48,40 @@ const PredictionModal = ({ match, onClose }) => {
       >
         <motion.div
           initial={{ scale: 0.9, y: 50 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 50 }}
-          className="bg-navy-900 border border-electric-blue/30 rounded-2xl p-4 sm:p-6 w-full max-w-3xl my-4 sm:my-8 relative shadow-[0_0_50px_rgba(0,240,255,0.15)]"
+          className="bg-navy-900 border border-electric-blue/30 rounded-2xl p-4 sm:p-6 lg:p-8 w-full max-w-4xl my-4 sm:my-8 relative shadow-[0_0_50px_rgba(0,240,255,0.15)]"
         >
           <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-light leading-none">&times;</button>
 
           <h2 className="text-2xl sm:text-3xl font-display font-bold text-center mb-2">Make Prediction</h2>
           <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <img src={match.team_a_logo} alt={match.team_a} className="w-8 h-5 object-cover rounded shadow border border-white/10 flex-shrink-0" />
+            <img src={match.team_a_logo} alt={match.team_a} className="w-8 h-5 sm:w-10 sm:h-6 object-cover rounded shadow border border-white/10 flex-shrink-0" />
             <p className="text-center text-gold font-semibold text-base sm:text-xl tracking-wide">{match.team_a} vs {match.team_b}</p>
-            <img src={match.team_b_logo} alt={match.team_b} className="w-8 h-5 object-cover rounded shadow border border-white/10 flex-shrink-0" />
+            <img src={match.team_b_logo} alt={match.team_b} className="w-8 h-5 sm:w-10 sm:h-6 object-cover rounded shadow border border-white/10 flex-shrink-0" />
           </div>
 
           {message && <div className="mb-6 bg-electric-blue/20 text-electric-blue p-3 sm:p-4 rounded-lg border border-electric-blue/50 text-center text-base sm:text-lg">{message}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
               {/* Prediction Section */}
               <div className="space-y-4 sm:space-y-5">
                 <h3 className="text-lg sm:text-xl font-bold border-b border-white/10 pb-2 sm:pb-3 text-electric-blue flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-electric-blue animate-pulse"></span> Match Events
                 </h3>
-                <select name="first_center" required onChange={handleChange} className="glass-input text-white bg-navy-900 border-electric-blue/50 focus:border-electric-blue py-2.5 sm:py-3 text-sm sm:text-base">
+                <select name="first_center" required onChange={handleChange} className="glass-input text-white bg-navy-900 border-electric-blue/50 focus:border-electric-blue py-2.5 sm:py-3 text-sm sm:text-base w-full">
                   <option value="">Select team to start from center</option>
                   <option value={match.team_a}>{match.team_a}</option>
                   <option value={match.team_b}>{match.team_b}</option>
                 </select>
 
-                <select name="first_corner" required onChange={handleChange} className="glass-input text-white bg-navy-900 border-electric-blue/50 focus:border-electric-blue py-2.5 sm:py-3 text-sm sm:text-base">
+                <select name="first_corner" required onChange={handleChange} className="glass-input text-white bg-navy-900 border-electric-blue/50 focus:border-electric-blue py-2.5 sm:py-3 text-sm sm:text-base w-full">
                   <option value="">Select team to get first corner</option>
                   <option value={match.team_a}>{match.team_a}</option>
                   <option value={match.team_b}>{match.team_b}</option>
                   <option value="None">None</option>
                 </select>
 
-                <select name="first_scorer" required onChange={handleChange} className="glass-input text-white bg-navy-900 border-electric-blue/50 focus:border-electric-blue py-2.5 sm:py-3 text-sm sm:text-base">
+                <select name="first_scorer" required onChange={handleChange} className="glass-input text-white bg-navy-900 border-electric-blue/50 focus:border-electric-blue py-2.5 sm:py-3 text-sm sm:text-base w-full">
                   <option value="">Select first goal scorer</option>
                   <option value={match.team_a}>{match.team_a} (Any Player)</option>
                   <option value={match.team_b}>{match.team_b} (Any Player)</option>
@@ -89,19 +89,19 @@ const PredictionModal = ({ match, onClose }) => {
                 </select>
 
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <div className="bg-white/5 p-2 sm:p-3 rounded-lg border border-white/10">
-                    <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1 sm:mb-2 truncate">Score {match.team_a}</label>
-                    <input type="number" name="score_a" min="0" required onChange={handleChange} className="w-full bg-transparent text-xl sm:text-2xl font-bold text-center focus:outline-none" defaultValue={0} />
+                  <div className="bg-white/5 p-2 sm:p-3 rounded-lg border border-white/10 flex flex-col items-center">
+                    <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider text-center mb-1 sm:mb-2 line-clamp-2 min-h-[32px] sm:min-h-[40px] flex items-center">Score {match.team_a}</label>
+                    <input type="number" name="score_a" min="0" required onChange={handleChange} className="w-full bg-transparent text-2xl sm:text-3xl font-bold text-center focus:outline-none" defaultValue={0} />
                   </div>
-                  <div className="bg-white/5 p-2 sm:p-3 rounded-lg border border-white/10">
-                    <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1 sm:mb-2 truncate">Score {match.team_b}</label>
-                    <input type="number" name="score_b" min="0" required onChange={handleChange} className="w-full bg-transparent text-xl sm:text-2xl font-bold text-center focus:outline-none" defaultValue={0} />
+                  <div className="bg-white/5 p-2 sm:p-3 rounded-lg border border-white/10 flex flex-col items-center">
+                    <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider text-center mb-1 sm:mb-2 line-clamp-2 min-h-[32px] sm:min-h-[40px] flex items-center">Score {match.team_b}</label>
+                    <input type="number" name="score_b" min="0" required onChange={handleChange} className="w-full bg-transparent text-2xl sm:text-3xl font-bold text-center focus:outline-none" defaultValue={0} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <input type="number" name="yellow_cards" placeholder="Total Yellow Cards" required onChange={handleChange} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base" />
-                  <input type="number" name="red_cards" placeholder="Total Red Cards" required onChange={handleChange} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base" />
+                  <input type="number" name="yellow_cards" placeholder="Yellow Cards" required onChange={handleChange} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base w-full" />
+                  <input type="number" name="red_cards" placeholder="Red Cards" required onChange={handleChange} className="glass-input py-2.5 sm:py-3 text-sm sm:text-base w-full" />
                 </div>
 
                 <select name="winner" required onChange={handleChange} className="glass-input text-white bg-navy-900 border-electric-blue/50 focus:border-electric-blue py-2.5 sm:py-3 text-sm sm:text-base">
