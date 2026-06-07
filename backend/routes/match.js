@@ -40,4 +40,70 @@ router.put('/:id', protect, admin, async (req, res) => {
   }
 });
 
+// Resolve match and calculate points (Admin only)
+router.put('/:id/resolve', protect, admin, async (req, res) => {
+  try {
+    const {
+      actual_first_center, actual_first_corner, actual_first_scorer,
+      actual_score_a, actual_score_b,
+      actual_yellow_cards_a, actual_yellow_cards_b,
+      actual_red_cards_a, actual_red_cards_b,
+      actual_winner
+    } = req.body;
+
+    // 1. Update Match record
+    const match = await prisma.match.update({
+      where: { id: req.params.id },
+      data: {
+        status: 'FINISHED',
+        score_a: parseInt(actual_score_a),
+        score_b: parseInt(actual_score_b),
+        actual_first_center,
+        actual_first_corner,
+        actual_first_scorer,
+        actual_yellow_cards_a: parseInt(actual_yellow_cards_a),
+        actual_yellow_cards_b: parseInt(actual_yellow_cards_b),
+        actual_red_cards_a: parseInt(actual_red_cards_a),
+        actual_red_cards_b: parseInt(actual_red_cards_b),
+        actual_winner
+      }
+    });
+
+    // 2. Find all VERIFIED predictions for this match
+    const predictions = await prisma.prediction.findMany({
+      where: { match_id: req.params.id, status: 'VERIFIED' }
+    });
+
+    // 3. Calculate points (1 pt each) and update users
+    for (const pred of predictions) {
+      let earned = 0;
+      if (pred.winner === actual_winner) earned += 1;
+      if (pred.score_a === parseInt(actual_score_a)) earned += 1;
+      if (pred.score_b === parseInt(actual_score_b)) earned += 1;
+      if (pred.first_center === actual_first_center) earned += 1;
+      if (pred.first_corner === actual_first_corner) earned += 1;
+      if (pred.first_scorer === actual_first_scorer) earned += 1;
+      if (pred.yellow_cards_a === parseInt(actual_yellow_cards_a)) earned += 1;
+      if (pred.yellow_cards_b === parseInt(actual_yellow_cards_b)) earned += 1;
+      if (pred.red_cards_a === parseInt(actual_red_cards_a)) earned += 1;
+      if (pred.red_cards_b === parseInt(actual_red_cards_b)) earned += 1;
+
+      if (earned > 0) {
+        await prisma.prediction.update({
+          where: { id: pred.id },
+          data: { points_earned: earned }
+        });
+        await prisma.user.update({
+          where: { id: pred.user_id },
+          data: { points: { increment: earned } }
+        });
+      }
+    }
+
+    res.json({ message: 'Match resolved and points distributed', match });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

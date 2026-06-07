@@ -37,6 +37,14 @@ model Match {
   score_a     Int         @default(0)
   score_b     Int         @default(0)
   events      String?
+  actual_first_center  String?
+  actual_first_corner  String?
+  actual_first_scorer  String?
+  actual_yellow_cards_a Int?
+  actual_yellow_cards_b Int?
+  actual_red_cards_a    Int?
+  actual_red_cards_b    Int?
+  actual_winner        String?
 
   predictions Prediction[]
 }
