@@ -12,7 +12,11 @@ const Matches = () => {
     const fetchMatches = async () => {
       try {
         const { data } = await axios.get('/api/matches');
-        setMatches(data);
+        if (Array.isArray(data)) {
+          setMatches(data);
+        } else {
+          console.error("API Error: Expected array but got", typeof data);
+        }
         setLoading(false);
       } catch (error) {
         console.error(error);

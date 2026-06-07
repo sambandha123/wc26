@@ -21,7 +21,11 @@ const Admin = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
       const { data } = await axios.get('/api/predictions', config);
-      setPredictions(data);
+      if (Array.isArray(data)) {
+        setPredictions(data);
+      } else {
+        console.error("API Error: Expected array but got", typeof data);
+      }
     } catch (error) {
       console.error(error);
     }

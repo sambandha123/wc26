@@ -10,7 +10,11 @@ const Groups = () => {
     const fetchGroups = async () => {
       try {
         const { data } = await axios.get('/api/groups');
-        setGroups(data);
+        if (Array.isArray(data)) {
+          setGroups(data);
+        } else {
+          console.error("API Error: Expected array but got", typeof data);
+        }
       } catch (error) {
         console.error('Error fetching groups:', error);
       } finally {

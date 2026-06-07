@@ -11,7 +11,11 @@ const Leaderboard = () => {
     const fetchLeaderboard = async () => {
       try {
         const { data } = await axios.get('/api/leaderboard');
-        setUsers(data);
+        if (Array.isArray(data)) {
+          setUsers(data);
+        } else {
+          console.error("API Error: Expected array but got", typeof data);
+        }
       } catch (error) {
         console.error(error);
       } finally {
