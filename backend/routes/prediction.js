@@ -33,6 +33,18 @@ router.post('/', protect, upload.single('screenshot'), async (req, res) => {
       score_a, score_b, yellow_cards_a, yellow_cards_b, red_cards_a, red_cards_b, winner 
     } = req.body;
 
+    const match = await prisma.match.findUnique({ where: { id: match_id } });
+    if (!match) return res.status(404).json({ message: 'Match not found' });
+
+    // Check if predictions are closed (15 minutes before match)
+    const matchTime = new Date(match.match_time);
+    const now = new Date();
+    const diffInMinutes = (matchTime - now) / (1000 * 60);
+
+    if (diffInMinutes <= 15) {
+      return res.status(400).json({ message: 'Predictions are closed for this match.' });
+    }
+
     // Create payment record
     const payment = await prisma.payment.create({
       data: {
@@ -64,7 +76,6 @@ router.post('/', protect, upload.single('screenshot'), async (req, res) => {
 
     // Fetch details for email
     const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-    const match = await prisma.match.findUnique({ where: { id: match_id } });
 
     // Send email to admin asynchronously
     if (req.file) {

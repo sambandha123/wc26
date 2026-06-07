@@ -70,6 +70,10 @@ const Matches = () => {
           const formattedDate = dateObj.toLocaleDateString('en-US', { timeZone: 'Asia/Kathmandu', weekday: 'short', month: 'short', day: 'numeric' });
           const formattedTime = dateObj.toLocaleTimeString('en-US', { timeZone: 'Asia/Kathmandu', hour: '2-digit', minute: '2-digit', hour12: false });
           const predictedRecord = myPredictions.find(p => p.match_id === match.id);
+          
+          const now = new Date();
+          const diffInMinutes = (dateObj - now) / (1000 * 60);
+          const isClosed = diffInMinutes <= 15;
 
           return (
             <motion.div
@@ -135,12 +139,26 @@ const Matches = () => {
                   >
                     Predicted ({predictedRecord.status})
                   </button>
+                ) : match.status === 'FINISHED' ? (
+                  <button 
+                    disabled
+                    className="w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base bg-white/5 text-gray-500 border-white/10"
+                  >
+                    View Details
+                  </button>
+                ) : isClosed ? (
+                  <button 
+                    disabled
+                    className="w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base bg-red-500/10 text-red-500/50 border-red-500/20"
+                  >
+                    Prediction Closed
+                  </button>
                 ) : (
                   <button 
                     onClick={() => setSelectedMatch(match)} 
                     className="w-full py-2.5 sm:py-3 rounded-lg bg-transparent hover:bg-electric-blue text-electric-blue hover:text-navy-900 border border-electric-blue/50 hover:border-transparent font-bold tracking-widest uppercase transition-all duration-300 text-sm sm:text-base"
                   >
-                    {match.status === 'FINISHED' ? 'View Details' : 'Predict Match'}
+                    Predict Match
                   </button>
                 )}
               </div>
