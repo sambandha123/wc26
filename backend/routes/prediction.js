@@ -146,4 +146,23 @@ router.get('/my', protect, async (req, res) => {
   }
 });
 
+// Get all verified predictions for a specific match (for the leaderboard)
+router.get('/match/:matchId', protect, async (req, res) => {
+  try {
+    const predictions = await prisma.prediction.findMany({
+      where: { 
+        match_id: req.params.matchId,
+        status: 'VERIFIED'
+      },
+      include: { 
+        user: { select: { id: true, name: true } }
+      },
+      orderBy: { points_earned: 'desc' }
+    });
+    res.json(predictions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

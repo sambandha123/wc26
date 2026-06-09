@@ -3,6 +3,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import PredictionModal from '../components/PredictionModal';
+import MatchResultsModal from '../components/MatchResultsModal';
 import { AuthContext } from '../context/AuthContext';
 
 const Matches = () => {
@@ -12,6 +13,7 @@ const Matches = () => {
   const [myPredictions, setMyPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [selectedFinishedMatch, setSelectedFinishedMatch] = useState(null);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -138,8 +140,8 @@ const Matches = () => {
                 
                 {match.status === 'FINISHED' ? (
                   <button 
-                    disabled
-                    className="w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base bg-white/5 text-gray-500 border-white/10"
+                    onClick={() => setSelectedFinishedMatch(match)}
+                    className="w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base bg-white/5 hover:bg-white/10 text-white border-white/20 hover:border-white/40 transition-all duration-300"
                   >
                     View Details
                   </button>
@@ -186,6 +188,10 @@ const Matches = () => {
 
       {selectedMatch && (
         <PredictionModal match={selectedMatch} onClose={() => setSelectedMatch(null)} onSuccess={handlePredictionSuccess} />
+      )}
+
+      {selectedFinishedMatch && (
+        <MatchResultsModal match={selectedFinishedMatch} onClose={() => setSelectedFinishedMatch(null)} />
       )}
     </div>
   );
