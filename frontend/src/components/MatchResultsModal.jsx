@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
@@ -7,6 +7,7 @@ const MatchResultsModal = ({ match, onClose }) => {
   const { user } = useContext(AuthContext);
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -108,17 +109,41 @@ const MatchResultsModal = ({ match, onClose }) => {
                     </thead>
                     <tbody>
                       {predictions.map((pred, idx) => (
-                        <tr key={pred.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                          <td className="px-4 py-3 font-bold">
-                            {idx === 0 ? <span className="text-2xl">🥇</span> : 
-                             idx === 1 ? <span className="text-2xl">🥈</span> : 
-                             idx === 2 ? <span className="text-2xl">🥉</span> : 
-                             <span className="text-gray-500 pl-2">#{idx + 1}</span>}
-                          </td>
-                          <td className="px-4 py-3 font-semibold text-white">{pred.user.name}</td>
-                          <td className="px-4 py-3">{pred.score_a} - {pred.score_b}</td>
-                          <td className="px-4 py-3 text-right font-bold text-gold text-base">{pred.points_earned}</td>
-                        </tr>
+                        <React.Fragment key={pred.id}>
+                          <tr 
+                            onClick={() => setExpandedId(expandedId === pred.id ? null : pred.id)}
+                            className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                          >
+                            <td className="px-4 py-3 font-bold">
+                              {idx === 0 ? <span className="text-2xl">🥇</span> : 
+                               idx === 1 ? <span className="text-2xl">🥈</span> : 
+                               idx === 2 ? <span className="text-2xl">🥉</span> : 
+                               <span className="text-gray-500 pl-2">#{idx + 1}</span>}
+                            </td>
+                            <td className="px-4 py-3 font-semibold text-white">{pred.user.name}</td>
+                            <td className="px-4 py-3">{pred.score_a} - {pred.score_b}</td>
+                            <td className="px-4 py-3 text-right font-bold text-gold text-base flex items-center justify-end gap-2">
+                              {pred.points_earned}
+                              <span className="text-gray-500 text-[10px]">{expandedId === pred.id ? '▲' : '▼'}</span>
+                            </td>
+                          </tr>
+                          {expandedId === pred.id && (
+                            <tr className="bg-black/40">
+                              <td colSpan="4" className="px-4 py-4 border-b border-white/5">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-gray-300">
+                                  <div><span className="text-gray-500 block mb-1">First Center:</span><span className="font-semibold text-white">{pred.first_center}</span></div>
+                                  <div><span className="text-gray-500 block mb-1">First Corner:</span><span className="font-semibold text-white">{pred.first_corner}</span></div>
+                                  <div><span className="text-gray-500 block mb-1">First Scorer:</span><span className="font-semibold text-white">{pred.first_scorer}</span></div>
+                                  <div><span className="text-gray-500 block mb-1">Predicted Winner:</span><span className="font-semibold text-white">{pred.winner}</span></div>
+                                  <div><span className="text-gray-500 block mb-1">🟨 Cards {match.team_a}:</span><span className="font-semibold text-white">{pred.yellow_cards_a}</span></div>
+                                  <div><span className="text-gray-500 block mb-1">🟨 Cards {match.team_b}:</span><span className="font-semibold text-white">{pred.yellow_cards_b}</span></div>
+                                  <div><span className="text-gray-500 block mb-1">🟥 Cards {match.team_a}:</span><span className="font-semibold text-white">{pred.red_cards_a}</span></div>
+                                  <div><span className="text-gray-500 block mb-1">🟥 Cards {match.team_b}:</span><span className="font-semibold text-white">{pred.red_cards_b}</span></div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
