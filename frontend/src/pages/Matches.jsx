@@ -1,11 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import PredictionModal from '../components/PredictionModal';
 import { AuthContext } from '../context/AuthContext';
 
 const Matches = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [matches, setMatches] = useState([]);
   const [myPredictions, setMyPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -154,6 +156,13 @@ const Matches = () => {
                     className="w-full py-2.5 sm:py-3 rounded-lg border font-bold tracking-widest uppercase text-sm sm:text-base bg-white/5 text-gray-500 border-white/10"
                   >
                     Max Predictions (5/5)
+                  </button>
+                ) : !user ? (
+                  <button 
+                    onClick={() => navigate('/login')} 
+                    className="w-full py-2.5 sm:py-3 rounded-lg bg-transparent hover:bg-gold text-gold hover:text-navy-900 border border-gold/50 hover:border-transparent font-bold tracking-widest uppercase transition-all duration-300 text-sm sm:text-base"
+                  >
+                    Login to Predict
                   </button>
                 ) : (
                   <button 
