@@ -83,16 +83,40 @@ router.put('/:id/resolve', protect, admin, async (req, res) => {
       if (pred.first_center === actual_first_center) earned += 1;
       if (pred.first_corner === actual_first_corner) earned += 1;
       if (pred.first_scorer === actual_first_scorer) earned += 1;
-      if (pred.yellow_cards_a === parseInt(actual_yellow_cards_a)) earned += 1;
-      if (pred.yellow_cards_b === parseInt(actual_yellow_cards_b)) earned += 1;
-      if (pred.red_cards_a === parseInt(actual_red_cards_a)) earned += 1;
-      if (pred.red_cards_b === parseInt(actual_red_cards_b)) earned += 1;
 
-      if (earned > 0) {
-        await prisma.prediction.update({
-          where: { id: pred.id },
-          data: { points_earned: earned }
-        });
+      // Card logic with penalties
+      if (pred.yellow_cards_a === parseInt(actual_yellow_cards_a)) {
+        earned += 1;
+      } else {
+        earned -= Math.abs(pred.yellow_cards_a - parseInt(actual_yellow_cards_a));
+      }
+
+      if (pred.yellow_cards_b === parseInt(actual_yellow_cards_b)) {
+        earned += 1;
+      } else {
+        earned -= Math.abs(pred.yellow_cards_b - parseInt(actual_yellow_cards_b));
+      }
+
+      if (pred.red_cards_a === parseInt(actual_red_cards_a)) {
+        earned += 1;
+      } else {
+        earned -= Math.abs(pred.red_cards_a - parseInt(actual_red_cards_a));
+      }
+
+      if (pred.red_cards_b === parseInt(actual_red_cards_b)) {
+        earned += 1;
+      } else {
+        earned -= Math.abs(pred.red_cards_b - parseInt(actual_red_cards_b));
+      }
+
+      // Always update prediction with the points (can be negative)
+      await prisma.prediction.update({
+        where: { id: pred.id },
+        data: { points_earned: earned }
+      });
+      
+      // Update global user points if it's not exactly 0
+      if (earned !== 0) {
         await prisma.user.update({
           where: { id: pred.user_id },
           data: { points: { increment: earned } }
